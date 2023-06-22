@@ -1,11 +1,12 @@
-FROM node:14
-
-WORKDIR /usr/src/app
-
+# Build stage
+FROM node:alpine AS build
+WORKDIR /app
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
 
-CMD [ "node", "index.js", "/var/run/dev-test/sock" ]
+# Final stage
+FROM node:alpine
+WORKDIR /app
+COPY --from=build /app .
+CMD ["node", "app.js", "/var/run/dev-test/sock"]
